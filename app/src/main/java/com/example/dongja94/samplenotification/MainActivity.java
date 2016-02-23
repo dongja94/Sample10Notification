@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RemoteViews;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
     EditText inputView;
 
+    String longMesage = "A notification is a message you can display to the user outside of your application's normal UI. When you tell the system to issue a notification, it first appears as an icon in the notification area. To see the details of the notification, the user opens the notification drawer. Both the notification area and the notification drawer are system-controlled areas that the user can view at any time.";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,8 +79,36 @@ public class MainActivity extends AppCompatActivity {
                 sendNotification(style);
             }
         });
-        mNM = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 
+        btn = (Button)findViewById(R.id.btn_custom);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RemoteViews views = new RemoteViews(getPackageName(), R.layout.view_custom);
+                views.setTextViewText(R.id.text_title, "Test Title");
+
+                Intent intent = new Intent(MainActivity.this, MyService.class);
+                intent.setData(Uri.parse("myscheme://" + getPackageName() + "/0"));
+                intent.putExtra("command", 0);
+                PendingIntent backpi= PendingIntent.getService(MainActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                views.setOnClickPendingIntent(R.id.btn_back,backpi);
+
+                intent = new Intent(MainActivity.this, MyService.class);
+                intent.setData(Uri.parse("myscheme://" + getPackageName() + "/1"));
+                intent.putExtra("command", 1);
+                PendingIntent stoppi = PendingIntent.getService(MainActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                views.setOnClickPendingIntent(R.id.btn_stop, stoppi);
+
+                intent = new Intent(MainActivity.this, MyService.class);
+                intent.setData(Uri.parse("myscheme://" + getPackageName() + "/2"));
+                intent.putExtra("command", 2);
+                PendingIntent nextpi = PendingIntent.getService(MainActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                views.setOnClickPendingIntent(R.id.btn_next, nextpi);
+
+                sendNotification(views);
+            }
+        });
+        mNM = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
     Handler mHander = new Handler();
@@ -121,21 +151,32 @@ public class MainActivity extends AppCompatActivity {
     int mId = 0;
 
     private void sendNotification() {
-        sendNotification(null);
+        sendNotification(null, null);
+    }
+
+    private void sendNotification(RemoteViews views) {
+        sendNotification(null, views);
     }
 
     private void sendNotification(NotificationCompat.Style style) {
+        sendNotification(style, null);
+    }
+
+    private void sendNotification(NotificationCompat.Style style, RemoteViews views) {
         mId++;
         String message = inputView.getText().toString();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder.setSmallIcon(R.mipmap.ic_launcher);
         builder.setTicker("Notification Ticker....");
-        builder.setContentTitle("Content Title..." + mId);
-        builder.setContentText("Content Text..." + message);
         builder.setDefaults(NotificationCompat.DEFAULT_ALL);
         builder.setAutoCancel(true);
         if (style != null) {
             builder.setStyle(style);
+        } else if (views != null) {
+            builder.setContent(views);
+        } else {
+            builder.setContentTitle("Content Title..." + mId);
+            builder.setContentText("Content Text..." + message);
         }
         Intent[] intents = new Intent[2];
         intents[0] = new Intent(this, MainActivity.class);

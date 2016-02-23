@@ -20,10 +20,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".NotifyActivity"
-            android:label="Notify"
-            android:exported="true">
-        </activity>
+        <activity
+            android:name=".NotifyActivity"
+            android:exported="true"
+            android:label="Notify"></activity>
+
+        <service
+            android:name=".MyService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>
