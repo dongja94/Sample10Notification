@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         builder.setAutoCancel(true);
         Intent[] intents = new Intent[2];
         intents[0] = new Intent(this, MainActivity.class);
-        intents[0].addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intents[0].addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         Intent intent = new Intent(this, NotifyActivity.class);
         intent.setData(Uri.parse("myscheme://com.example.dongja94.samplenotification/" + mId));
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
