@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
@@ -57,9 +58,53 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        btn = (Button)findViewById(R.id.btn_progress);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startProgress();
+            }
+        });
         mNM = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 
     }
+
+    Handler mHander = new Handler();
+
+    private void startProgress() {
+        mHander.removeCallbacks(progressRunnable);
+        progress = 0;
+        mHander.post(progressRunnable);
+    }
+
+    int progress = 0;
+    int mProgressId = 100;
+
+    Runnable progressRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (progress <= 100) {
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this);
+                builder.setSmallIcon(android.R.drawable.ic_dialog_alert);
+                builder.setTicker("download progress");
+                builder.setContentTitle("a file download...");
+                builder.setContentText("download : " + progress);
+                builder.setProgress(100, progress, false);
+                builder.setOngoing(true);
+                builder.setOnlyAlertOnce(true);
+                Notification notification = builder.build();
+
+                mNM.notify(mProgressId, notification);
+
+                progress+=5;
+
+                mHander.postDelayed(this, 500);
+            } else {
+                mNM.cancel(mProgressId);
+            }
+        }
+
+    };
 
     int mId = 0;
 
