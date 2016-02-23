@@ -2,7 +2,10 @@ package com.example.dongja94.samplenotification;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,10 +16,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 public class MainActivity extends AppCompatActivity {
 
     NotificationManager mNM;
+
+    EditText inputView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        inputView = (EditText)findViewById(R.id.edit_message);
         Button btn = (Button)findViewById(R.id.btn_send);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,17 +58,27 @@ public class MainActivity extends AppCompatActivity {
         });
 
         mNM = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+
     }
 
     int mId = 0;
 
     private void sendNotification() {
+        mId++;
+        String message = inputView.getText().toString();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder.setSmallIcon(R.mipmap.ic_launcher);
         builder.setTicker("Notification Ticker....");
-        builder.setContentTitle("Content Title...");
-        builder.setContentText("Content Text...");
+        builder.setContentTitle("Content Title..." + mId);
+        builder.setContentText("Content Text..." + message);
         builder.setDefaults(NotificationCompat.DEFAULT_ALL);
+        builder.setAutoCancel(true);
+        Intent intent = new Intent(this, NotifyActivity.class);
+        intent.setData(Uri.parse("myscheme://com.example.dongja94.samplenotification/" + mId));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(NotifyActivity.EXTRA_MESSAGE, message);
+        PendingIntent pi = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(pi);
         Notification notification = builder.build();
         mNM.notify(mId, notification);
     }
