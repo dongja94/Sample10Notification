@@ -65,6 +65,18 @@ public class MainActivity extends AppCompatActivity {
                 startProgress();
             }
         });
+
+        btn = (Button)findViewById(R.id.btn_big_text);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NotificationCompat.BigTextStyle style = new NotificationCompat.BigTextStyle();
+                style.setBigContentTitle("TextView....");
+                style.setSummaryText("summary....");
+                style.bigText("A notification is a message you can display to the user outside of your application's normal UI. When you tell the system to issue a notification, it first appears as an icon in the notification area. To see the details of the notification, the user opens the notification drawer. Both the notification area and the notification drawer are system-controlled areas that the user can view at any time.");
+                sendNotification(style);
+            }
+        });
         mNM = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 
     }
@@ -109,6 +121,10 @@ public class MainActivity extends AppCompatActivity {
     int mId = 0;
 
     private void sendNotification() {
+        sendNotification(null);
+    }
+
+    private void sendNotification(NotificationCompat.Style style) {
         mId++;
         String message = inputView.getText().toString();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
@@ -118,6 +134,9 @@ public class MainActivity extends AppCompatActivity {
         builder.setContentText("Content Text..." + message);
         builder.setDefaults(NotificationCompat.DEFAULT_ALL);
         builder.setAutoCancel(true);
+        if (style != null) {
+            builder.setStyle(style);
+        }
         Intent[] intents = new Intent[2];
         intents[0] = new Intent(this, MainActivity.class);
         intents[0].addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
