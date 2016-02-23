@@ -73,11 +73,16 @@ public class MainActivity extends AppCompatActivity {
         builder.setContentText("Content Text..." + message);
         builder.setDefaults(NotificationCompat.DEFAULT_ALL);
         builder.setAutoCancel(true);
+        Intent[] intents = new Intent[2];
+        intents[0] = new Intent(this, MainActivity.class);
+        intents[0].addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         Intent intent = new Intent(this, NotifyActivity.class);
         intent.setData(Uri.parse("myscheme://com.example.dongja94.samplenotification/" + mId));
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(NotifyActivity.EXTRA_MESSAGE, message);
-        PendingIntent pi = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        intents[1] = intent;
+//        PendingIntent pi = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pi = PendingIntent.getActivities(this, 0, intents, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pi);
         Notification notification = builder.build();
         mNM.notify(mId, notification);
